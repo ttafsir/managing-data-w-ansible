@@ -1,0 +1,50 @@
+- name: PLAY | test ansible loops
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    interfaces:
+      - "TenGigE0/0/0/0"
+      - "TenGigE0/0/0/1"
+
+  tasks:
+    - name: DATA | load scale data from yaml file
+      ansible.builtin.include_vars:
+        file: scale.json
+        name: data
+      tags: always
+
+    - name: SET | set some variables for later tasks
+      ansible.builtin.set_fact:
+        pseudowires: "{{ data.pseudo_wires.services }}"
+        pseudowire_count: "{{ data.pseudo_wires.services | length }}"
+      tags: always
+
+    - name: DEBUG | loop through pseudo_wires and print
+      debug:
+        msg: |
+          service: {{ item.service_id }}  vlan: {{ item.primary_vlan }}
+      loop: "{{ pseudowires }}"
+      tags: simple_loop
+
+    - name: LOOP & SET | loop and combine with `loop`
+      ansible.builtin.set_fact:
+        l2vpns_loop: "{{ l2vpns_loop|default([]) + [item | combine({'interface': interfaces[0]})] }}"
+      loop: "{{ pseudowires }}"
+      tags: combine_loop
+
+    - name: LOOP & SET | loop and combine with jinja
+      ansible.builtin.set_fact:
+        l2vpns_jinja: |
+          [
+            {% for service in pseudowires %}
+            {{ service | combine({'interface': interfaces[0]}) }}
+            {%     if not loop.last %}, {% endif %}
+            {% endfor %}
+          ]
+      tags: jinja_loop
+
+    - name: ASSERT | check that the lists are similar
+      ansible.builtin.assert:
+        that: l2vpns_jinja == l2vpns_loop
+      tags: assert_eq
