@@ -48,7 +48,7 @@
             {%     if not loop.last %}, {% endif %}
             {% endfor %}
           ]
-      tags: jinja_loop
+      tags: combine_jinja
 
     - name: ASSERT | check that the lists are similar
       ansible.builtin.assert:

@@ -11,19 +11,19 @@ Check out the difference between the bultin Ansible `loop` and `jinja2` loops to
 Testing with `jinja2`
 
 ```sh
-time ansible-playbook playbook-loops.yml --tags l2vpns_jinja
+time ansible-playbook playbook-loops.yml --tags combine_jinja
 ```
 
 Now with `loop`
 
 ```sh
-time ansible-playbook playbook-loops.yml --tags l2vpns_loop
+time ansible-playbook playbook-loops.yml --tags combine_loop
 ```
 
 Also, with `with_items`
 
 ```sh
-time ansible-playbook playbook-loops.yml --tags l2vpns_with
+time ansible-playbook playbook-loops.yml --tags combine_with
 ```
 
 Test all of them and ensure same list
