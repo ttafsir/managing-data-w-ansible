@@ -33,6 +33,12 @@
       loop: "{{ pseudowires }}"
       tags: combine_loop
 
+    - name: LOOP & SET | loop and combine with `with_items`
+      ansible.builtin.set_fact:
+        l2vpns_with: "{{ l2vpns_loop|default([]) + [item | combine({'interface': interfaces[0]})] }}"
+      with_items: "{{ pseudowires }}"
+      tags: combine_with
+
     - name: LOOP & SET | loop and combine with jinja
       ansible.builtin.set_fact:
         l2vpns_jinja: |
@@ -46,5 +52,5 @@
 
     - name: ASSERT | check that the lists are similar
       ansible.builtin.assert:
-        that: l2vpns_jinja == l2vpns_loop
+        that: l2vpns_jinja == l2vpns_loop == l2vpns_with
       tags: assert_eq
